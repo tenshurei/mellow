@@ -38,8 +38,19 @@ app.get('/', checkAuth, async (req, res) => {
     // Senin yazdığın 'my_worlds' fonksiyonu ile oyuncunun dünyalarını çekiyoruz
     const { data: worlds } = await supabase.rpc('my_worlds', { p_token: req.token });
     
+    // EJS çökmesin diye arayüzün beklediği sahte veriyi şimdilik tekrar ekliyoruz
+    const petData = {
+        name: 'Mochi',
+        level: 4,
+        stats: { hunger: 80, energy: 60, happiness: 90 }
+    };
+    
     // Verileri EJS'e yolla
-    res.render('index', { player: req.user.username, worlds: worlds || [] });
+    res.render('index', { 
+        player: req.user.username, 
+        worlds: worlds || [],
+        pet: petData 
+    });
 });
 
 // GİRİŞ/KAYIT EKRANI

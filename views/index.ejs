@@ -2,61 +2,242 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>Mellow Pet</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Pet Life</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F0F4F8;
-    --primary: #FF8B94;
-    --primary-shadow: #D8606B;
-    --ui-bg: #FFFFFF;
-    --text: #2D3436;
+    /* Pet Life Pastel Renk Paleti */
+    --bg-color: #F8F9FA;
+    --anthracite: #2D3436;
+    --lavender: #E0BBE4;
+    --lavender-shadow: #B892BE;
+    --mint: #95E1D3;
+    --mint-shadow: #74C0B2;
+    --light-blue: #A8D8EA;
+    --light-blue-shadow: #85B5C7;
+    --soft-orange: #FFD3B6;
+    --soft-orange-shadow: #E5A885;
+    --cream: #FFF5EA;
+    
+    --card-bg: #FFFFFF;
+    --text-main: #2D3436;
+    --text-muted: #636E72;
   }
-  body { margin: 0; font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; min-height: 100vh; user-select: none; }
-  .app-container { width: 100%; max-width: 400px; background: var(--bg); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-  .stage { flex: 1; background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 60%, #A8E6CF 60%, #7DC6AB 100%); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 40px; border-radius: 0 0 40px 40px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-  
-  .header-info { position: absolute; top: 60px; text-align: center; width: 100%; font-weight: 800; font-size: 22px; color: #2D3436; }
-  .header-info small { display: block; font-size: 13px; opacity: 0.7; }
-  
-  .pet-sprite { font-size: 100px; animation: breathe 2s infinite ease-in-out; filter: drop-shadow(0 15px 10px rgba(0,0,0,0.2)); }
-  @keyframes breathe { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.05) translateY(-5px); } }
-  
-  .stats { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; gap: 10px; }
-  .stat-bar { flex: 1; height: 24px; background: rgba(255,255,255,0.5); border-radius: 20px; border: 3px solid #FFF; overflow: hidden; position: relative; }
-  .fill { height: 100%; border-radius: 20px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-  .fill::after { content: ''; position: absolute; top: 2px; left: 5px; right: 5px; height: 6px; background: rgba(255,255,255,0.4); border-radius: 10px; }
 
-  .action-panel { padding: 30px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-  .btn { background: var(--ui-bg); border: 3px solid #E1E8ED; border-radius: 20px; padding: 15px 10px; font: inherit; font-size: 16px; font-weight: 800; color: var(--text); cursor: pointer; box-shadow: 0 6px 0 #E1E8ED; transition: all 0.1s; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-  .btn span { font-size: 28px; }
-  .btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
-  .btn.primary { background: var(--primary); border-color: var(--primary-shadow); color: white; box-shadow: 0 6px 0 var(--primary-shadow); }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    /* 100vh ve 100vw sınırlarını aşmaması için (Bölüm 3 Gereksinimi) */
+    height: 100dvh;
+    overflow: hidden; 
+    user-select: none;
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 415px; /* Hedef genişlik */
+    height: 100%;
+    background: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* --- ÜST BİLGİ (HEADER) --- */
+  .header {
+    padding: 25px 20px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-color);
+    z-index: 10;
+  }
+  .header-left h1 { margin: 0; font-size: 24px; font-weight: 900; color: var(--anthracite); }
+  .header-left p { margin: 0; font-size: 14px; font-weight: 700; color: var(--text-muted); }
+  .header-right .avatar {
+    width: 45px; height: 45px;
+    background: var(--lavender);
+    border-radius: 15px;
+    display: grid; place-items: center;
+    font-size: 20px;
+    border: 3px solid #FFF;
+    box-shadow: 0 4px 0 var(--lavender-shadow);
+  }
+
+  /* --- ORTA ALAN (KAYDIRILABİLİR PET LİSTESİ) --- */
+  .scroll-area {
+    flex: 1;
+    padding: 10px 20px 100px; /* Alt barın altında kalmasın diye alt boşluk */
+    overflow-y: auto;
+    /* Kaydırma çubuğunu gizle ama kaydırmaya izin ver */
+    scrollbar-width: none; 
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  .section-title {
+    font-size: 16px; font-weight: 800;
+    margin-bottom: 15px; color: var(--text-muted);
+  }
+
+  /* --- TOK (CHUNKY) PET KARTLARI --- */
+  .pet-card {
+    background: var(--card-bg);
+    border: 3px solid #E1E8ED;
+    border-radius: 24px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #E1E8ED;
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .pet-card:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 transparent;
+  }
+  
+  .pet-icon {
+    width: 65px; height: 65px;
+    background: var(--mint);
+    border-radius: 20px;
+    display: grid; place-items: center;
+    font-size: 35px;
+    border: 3px solid #FFF;
+    box-shadow: 0 4px 0 var(--mint-shadow);
+    flex-shrink: 0;
+  }
+  
+  .pet-info { flex: 1; }
+  .pet-name { font-size: 18px; font-weight: 800; margin: 0 0 4px 0; }
+  .pet-meta { font-size: 13px; font-weight: 700; color: var(--text-muted); margin: 0; }
+  
+  .pet-level {
+    background: var(--soft-orange);
+    color: var(--anthracite);
+    padding: 5px 12px;
+    border-radius: 12px;
+    font-size: 13px; font-weight: 800;
+    box-shadow: 0 3px 0 var(--soft-orange-shadow);
+  }
+
+  /* --- SABİT ALT NAVİGASYON (Bölüm 11) --- */
+  .bottom-nav {
+    position: absolute;
+    bottom: 20px; left: 20px; right: 20px;
+    background: var(--anthracite);
+    border-radius: 24px;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 10px;
+    color: #A0AAB2; font-size: 12px; font-weight: 700;
+    transition: 0.2s; cursor: pointer;
+  }
+  .nav-item.active { color: #FFF; }
+  .nav-item span { font-size: 22px; margin-bottom: 2px; }
+  
+  /* Boş Durum */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    background: var(--cream); border-radius: 24px;
+    border: 3px dashed #E1E8ED;
+  }
+  .empty-state h3 { margin: 10px 0; color: var(--anthracite); font-weight: 800; }
+  
+  .btn-create {
+    display: inline-block;
+    background: var(--light-blue);
+    border: 3px solid var(--light-blue-shadow);
+    color: var(--anthracite);
+    padding: 12px 24px; border-radius: 16px;
+    font-weight: 800; text-decoration: none;
+    box-shadow: 0 5px 0 var(--light-blue-shadow);
+    margin-top: 10px; transition: 0.1s;
+  }
+  .btn-create:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
+
 </style>
 </head>
 <body>
 
 <div class="app-container">
-  <div class="stage">
-    <div class="stats">
-      <div class="stat-bar"><div class="fill" style="width: <%= pet.stats.hunger %>%; background: #FF9A8B;"></div></div>
-      <div class="stat-bar"><div class="fill" style="width: <%= pet.stats.energy %>%; background: #A8E6CF;"></div></div>
-      <div class="stat-bar"><div class="fill" style="width: <%= pet.stats.happiness %>%; background: #FFD3B6;"></div></div>
+  
+  <!-- Üst Bilgi -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Hoş Geldin!</h1>
+      <p><%= player %></p> <!-- Supabase'den gelen oyuncu adı -->
     </div>
-    
-    <div class="header-info">
-      <%= pet.name %> (Lv. <%= pet.level %>)
-      <small>Sahibi: <%= player %></small>
+    <div class="header-right">
+      <div class="avatar">🧑‍🚀</div>
     </div>
-    <div class="pet-sprite">🦊</div> 
   </div>
 
-  <div class="action-panel">
-    <button class="btn"><span>🍖</span> Besle</button>
-    <button class="btn primary"><span>🎾</span> Oyna</button>
-    <button class="btn"><span>💤</span> Uyut</button>
+  <!-- Kaydırılabilir İçerik Alanı -->
+  <div class="scroll-area">
+    <div class="section-title">Evcil Hayvanların (<%= worlds.length %>)</div>
+
+    <!-- EJS ile Supabase verilerini döngüye sokuyoruz -->
+    <% if (worlds && worlds.length > 0) { %>
+      <% worlds.forEach(function(world) { %>
+        <!-- İleride bu karta tıklandığında '/pet/ID' sayfasına (Odaya) gideceğiz -->
+        <div class="pet-card" onclick="window.location.href='/pet/<%= world.id %>'">
+          <div class="pet-icon">
+            <!-- 3D Render'lar gelene kadar geçici emoji -->
+            <%= (world.pets && world.pets[0] && world.pets[0].type === 'dog') ? '🐶' : (world.pets && world.pets[0] && world.pets[0].type === 'bunny') ? '🐰' : '🐱' %>
+          </div>
+          <div class="pet-info">
+            <h3 class="pet-name"><%= world.pets ? world.pets[0].name : world.name %></h3>
+            <p class="pet-meta">🐾 <%= world.name %></p>
+          </div>
+          <div class="pet-level">
+            Lv. <%= world.pets ? world.pets[0].level : 1 %>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <!-- Oyuncunun henüz hiç peti yoksa burası görünür -->
+      <div class="empty-state">
+        <span style="font-size: 40px;">🏡</span>
+        <h3>Henüz bir petin yok</h3>
+        <p style="font-size: 14px; color: var(--text-muted);">Sahiplenmek için hemen yeni bir dünya oluştur.</p>
+        <a href="/create" class="btn-create">🐾 Yeni Pet Sahiplen</a>
+      </div>
+    <% } %>
+
   </div>
+
+  <!-- Alt Navigasyon Barı -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <span>🏠</span> Ev
+    </div>
+    <div class="nav-item">
+      <span>🎒</span> Çanta
+    </div>
+    <div class="nav-item">
+      <span>👥</span> Sosyal
+    </div>
+    <div class="nav-item">
+      <span>👤</span> Profil
+    </div>
+  </div>
+
 </div>
 
 </body>

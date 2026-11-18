@@ -3,211 +3,223 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Pet Life</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&display=swap" rel="stylesheet">
+<title>Pet Life - Widgetable Style</title>
+<!-- Modern iOS estetiği için Inter fontu -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Gerçek Oyun Renk Paleti */
-    --game-bg: #E8F1F5;
-    --card-bg: #FFFFFF;
-    --text-dark: #303952;
-    --text-muted: #828EA6;
+    /* Widgetable Pastel & Glassmorphism Renkleri */
+    --text-main: #1C1C1E;
+    --text-sub: #8E8E93;
+    --primary: #FF8F9C; /* Romantik yumuşak pembe/mercan */
     
-    /* Canlı Aksanlar */
-    --accent-blue: #45AAF2;
-    --accent-blue-shadow: #2D98DA;
-    --accent-green: #26DE81;
-    --accent-green-shadow: #20BF6B;
-    --accent-orange: #FA8231;
-    --accent-orange-shadow: #EB3B5A;
+    /* Buzlu Cam Değerleri */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  body {
-    margin: 0;
-    font-family: 'Fredoka', sans-serif;
-    background-color: var(--game-bg);
-    /* Hafif noktalı oyun zemini (Polka dot) */
-    background-image: radial-gradient(#D1D8E0 2px, transparent 2px);
-    background-size: 24px 24px;
-    color: var(--text-dark);
-    display: flex; justify-content: center;
+  body, html {
+    margin: 0; padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #F4F5F9;
+    color: var(--text-main);
     height: 100dvh; overflow: hidden; user-select: none;
   }
 
-  .app-container {
+  .app-wrapper {
     width: 100%; max-width: 415px; height: 100%;
-    display: flex; flex-direction: column; position: relative;
+    margin: 0 auto; display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
   }
 
-  /* --- ÜST BİLGİ (HEADER) --- */
+  /* --- WIDGETABLE ESTETİK ARKA PLAN (Hareketli Pastel Bloblar) --- */
+  .bg-blobs {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; overflow: hidden;
+    filter: blur(60px); opacity: 0.55;
+  }
+  .blob { position: absolute; border-radius: 50%; animation: float 10s infinite ease-in-out alternate; }
+  .blob:nth-child(1) { width: 320px; height: 320px; background: #FFD1FF; top: -10%; left: -10%; }
+  .blob:nth-child(2) { width: 280px; height: 280px; background: #E0C3FC; bottom: 10%; right: -10%; animation-delay: -3s; }
+  .blob:nth-child(3) { width: 220px; height: 220px; background: #8EC5FC; top: 40%; left: 35%; animation-delay: -6s; }
+
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 40px) scale(1.1); }
+  }
+
+  /* --- HEADER --- */
   .header {
-    padding: 30px 20px 20px;
+    padding: 50px 24px 20px;
     display: flex; justify-content: space-between; align-items: center;
-    background: linear-gradient(180deg, rgba(232,241,245,1) 60%, rgba(232,241,245,0) 100%);
     z-index: 10;
   }
-  .header-left h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent-blue); text-shadow: 0 2px 0 var(--accent-blue-shadow); }
-  .header-left p { margin: 4px 0 0; font-size: 15px; font-weight: 700; color: var(--text-muted); }
+  .greeting h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .greeting p { margin: 4px 0 0; font-size: 15px; color: var(--text-sub); font-weight: 500; }
   
-  .avatar-frame {
-    width: 55px; height: 55px;
-    background: var(--accent-orange);
-    border-radius: 18px;
-    display: grid; place-items: center; font-size: 26px;
-    border: 4px solid #FFF;
-    box-shadow: 0 6px 0 var(--accent-orange-shadow), 0 10px 15px rgba(250,130,49,0.3);
+  .profile-pic {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #FFF; display: grid; place-items: center; font-size: 22px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
   }
 
-  /* --- ORTA ALAN (KAYDIRILABİLİR PET LİSTESİ) --- */
+  /* --- SCROLL ALANI --- */
   .scroll-area {
-    flex: 1; padding: 10px 20px 110px;
-    overflow-y: auto; scrollbar-width: none;
+    flex: 1; padding: 0 24px 130px;
+    overflow-y: auto; scrollbar-width: none; z-index: 10;
   }
   .scroll-area::-webkit-scrollbar { display: none; }
 
-  .section-badge {
-    display: inline-block;
-    background: var(--card-bg);
-    padding: 6px 16px; border-radius: 20px;
-    font-size: 14px; font-weight: 800; color: var(--text-muted);
-    border: 3px solid #E1E8ED; box-shadow: 0 4px 0 #E1E8ED;
-    margin-bottom: 20px;
-  }
-
-  /* --- GERÇEK OYUN KARTLARI (3D TOK HİSSİYAT) --- */
+  /* --- WIDGETABLE TARZI PET KARTI (Buzlu Cam) --- */
   .pet-card {
-    background: var(--card-bg);
-    border: 4px solid #D1D8E0;
-    border-radius: 28px;
-    padding: 16px;
-    display: flex; align-items: center; gap: 16px;
-    margin-bottom: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border: 1.5px solid var(--glass-border);
+    border-radius: 36px;
+    padding: 30px 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--glass-shadow);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
     cursor: pointer;
-    box-shadow: 0 8px 0 #D1D8E0, 0 15px 20px rgba(0,0,0,0.05);
-    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s;
-    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  
-  .pet-card:active {
-    transform: translateY(8px) scale(0.98);
-    box-shadow: 0 0 0 transparent, 0 5px 10px rgba(0,0,0,0.05);
-  }
+  .pet-card:active { transform: scale(0.96); }
 
-  .pet-icon-wrapper {
-    width: 75px; height: 75px;
-    background: linear-gradient(135deg, var(--accent-green), var(--accent-green-shadow));
-    border-radius: 22px;
-    display: grid; place-items: center; font-size: 40px;
-    border: 4px solid #FFF;
-    box-shadow: 0 6px 0 var(--accent-green-shadow);
+  /* Widgetable Dairesel Pet Odak Alanı */
+  .pet-circle {
+    width: 140px; height: 140px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 75px;
+    box-shadow: inset 0 0 20px rgba(255,255,255,0.6), 0 10px 24px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
     position: relative;
   }
-  /* Parlama efekti */
-  .pet-icon-wrapper::after {
-    content: ''; position: absolute; top: 4px; left: 8px; right: 8px; height: 12px;
-    background: rgba(255,255,255,0.3); border-radius: 10px;
-  }
-
-  .pet-info { flex: 1; }
-  .pet-name { font-size: 22px; font-weight: 800; margin: 0 0 4px 0; color: var(--text-dark); }
-  .pet-meta { font-size: 14px; font-weight: 700; color: var(--text-muted); margin: 0; display: flex; align-items: center; gap: 4px; }
-
-  .level-badge {
-    background: var(--accent-blue); color: #FFF;
-    padding: 6px 14px; border-radius: 16px;
-    font-size: 15px; font-weight: 800;
-    border: 3px solid #FFF;
-    box-shadow: 0 4px 0 var(--accent-blue-shadow);
-  }
-
-  /* --- YÜZEN ALT NAVİGASYON (Floating Game Nav) --- */
-  .bottom-nav-container {
-    position: absolute; bottom: 25px; left: 20px; right: 20px;
-    background: var(--card-bg);
-    border: 4px solid #D1D8E0; border-radius: 30px;
-    display: flex; justify-content: space-around; padding: 12px 10px;
-    box-shadow: 0 8px 0 #D1D8E0, 0 20px 30px rgba(0,0,0,0.1);
-  }
   
+  /* Seviye rozeti (Hap şeklinde) */
+  .level-badge {
+    position: absolute; bottom: 0; right: 0;
+    background: var(--primary); color: #FFF;
+    font-size: 13px; font-weight: 700;
+    padding: 6px 14px; border-radius: 20px;
+    border: 2.5px solid #FFF;
+    box-shadow: 0 4px 12px rgba(255, 143, 156, 0.35);
+  }
+
+  .pet-card h3 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -0.3px; }
+  .pet-card p { margin: 0 0 20px; font-size: 15px; color: var(--text-sub); font-weight: 500; }
+
+  /* Etiketler (Tags) */
+  .tags { display: flex; gap: 8px; justify-content: center; }
+  .tag { 
+    background: rgba(0,0,0,0.04); padding: 8px 16px; 
+    border-radius: 14px; font-size: 13px; font-weight: 600; color: var(--text-main); 
+  }
+  .tag.couple { 
+    background: rgba(255, 143, 156, 0.12); color: var(--primary); 
+  }
+
+  /* --- YÜZEN HAP NAVİGASYON (Dynamic Island / Widgetable Nav) --- */
+  .nav-island {
+    position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.6);
+    display: flex; gap: 8px; padding: 8px;
+    border-radius: 100px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    z-index: 20;
+  }
   .nav-btn {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    color: var(--text-muted); font-size: 13px; font-weight: 800;
-    transition: 0.2s; cursor: pointer; padding: 5px 15px; border-radius: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 22px; color: var(--text-sub);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
   }
-  .nav-btn.active { background: var(--game-bg); color: var(--accent-blue); }
-  .nav-btn span { font-size: 26px; filter: grayscale(1); transition: 0.2s; }
-  .nav-btn.active span { filter: grayscale(0); transform: translateY(-3px); }
+  .nav-btn.active { background: var(--text-main); color: #FFF; }
+  .nav-btn:active { transform: scale(0.9); }
 
-  /* Animasyonlar */
-  @keyframes popIn {
-    0% { transform: scale(0.8) translateY(20px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
+  /* --- BOŞ DURUM --- */
+  .empty-state {
+    text-align: center; padding: 50px 20px;
+    background: rgba(255,255,255,0.4); border-radius: 36px;
+    border: 1.5px dashed rgba(0,0,0,0.1); margin-top: 20px;
   }
-
-  /* Boş Durum (Empty State) - Oyun Kutusu Tarzı */
-  .empty-box {
-    background: var(--card-bg); border: 4px dashed #D1D8E0; border-radius: 28px;
-    text-align: center; padding: 40px 20px; margin-top: 20px;
+  .btn-primary {
+    display: inline-block; background: var(--text-main); color: #FFF;
+    padding: 18px 36px; border-radius: 100px; font-size: 16px; font-weight: 600;
+    text-decoration: none; margin-top: 20px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.15); transition: 0.2s;
   }
-  .btn-game {
-    display: inline-block; background: var(--accent-green); color: #FFF;
-    font-size: 18px; font-weight: 800; text-decoration: none;
-    padding: 16px 30px; border-radius: 22px; border: 4px solid #FFF;
-    box-shadow: 0 6px 0 var(--accent-green-shadow), 0 10px 15px rgba(38, 222, 129, 0.3);
-    margin-top: 20px; transition: transform 0.1s;
-  }
-  .btn-game:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+  .btn-primary:active { transform: scale(0.96); box-shadow: 0 5px 12px rgba(0,0,0,0.1); }
 
 </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-wrapper">
   
+  <!-- Arka Plan Estetik Bloblar -->
+  <div class="bg-blobs">
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+  </div>
+
   <div class="header">
-    <div class="header-left">
-      <h1>Pet Life</h1>
-      <p>Oyuncu: <%= player %></p>
+    <div class="greeting">
+      <h1>Hoş geldin,</h1>
+      <p><%= player %></p>
     </div>
-    <div class="avatar-frame">🧑‍🚀</div>
+    <div class="profile-pic">🧑‍🚀</div>
   </div>
 
   <div class="scroll-area">
-    <div class="section-badge">Senin Dünyaların (<%= worlds.length %>)</div>
-
     <% if (worlds && worlds.length > 0) { %>
-      <% worlds.forEach(function(world, index) { %>
-        <!-- Animasyon gecikmesi ile kartların sırayla tatlı şekilde düşmesini sağlıyoruz -->
-        <div class="pet-card" onclick="window.location.href='/pet/<%= world.id %>'" style="animation-delay: <%= index * 0.1 %>s">
-          <div class="pet-icon-wrapper">
+      <% worlds.forEach(function(world) { %>
+        <!-- Widgetable Tarzı Geniş ve Yuvarlak Kart -->
+        <div class="pet-card" onclick="window.location.href='/pet/<%= world.id %>'">
+          
+          <div class="pet-circle">
             <%= (world.safePet.type === 'dog') ? '🐶' : (world.safePet.type === 'bunny') ? '🐰' : '🐱' %>
+            <div class="level-badge">Lv. <%= world.safePet.level %></div>
           </div>
-          <div class="pet-info">
-            <h3 class="pet-name"><%= world.safePet.name %></h3>
-            <p class="pet-meta">🏡 <%= world.name %></p>
+          
+          <h3><%= world.safePet.name %></h3>
+          <p>🏡 <%= world.name %></p>
+          
+          <!-- Özellik Etiketleri (Widgetable Besties hissiyatı için) -->
+          <div class="tags">
+            <div class="tag">Mutlu ✨</div>
+            <% if(world.members && world.members.length > 1) { %>
+              <div class="tag couple">Ortak Pet 💖</div>
+            <% } else { %>
+              <div class="tag">Tek Başına</div>
+            <% } %>
           </div>
-          <div class="level-badge">
-            Lv. <%= world.safePet.level %>
-          </div>
+
         </div>
       <% }); %>
     <% } else { %>
-      <div class="empty-box">
-        <span style="font-size: 50px;">🐾</span>
-        <h3 style="font-size: 22px; margin: 10px 0;">Evcil Hayvanın Yok</h3>
-        <p style="color: var(--text-muted); font-weight: 700;">Hemen kendine bir dost edin.</p>
-        <a href="/create" class="btn-game">Yeni Pet Sahiplen</a>
+      <div class="empty-state">
+        <span style="font-size: 56px;">🥚</span>
+        <h3 style="font-size: 22px; font-weight: 700; margin: 16px 0 8px;">Yumurtan hazır</h3>
+        <p style="color: var(--text-sub); font-weight: 500; font-size: 15px; margin: 0;">Yeni bir dost sahiplen ve hemen bakmaya başla.</p>
+        <a href="/create" class="btn-primary">Yumurtayı Kır</a>
       </div>
     <% } %>
   </div>
 
-  <div class="bottom-nav-container">
-    <div class="nav-btn active"><span>🏠</span> Ev</div>
-    <div class="nav-btn"><span>🎒</span> Çanta</div>
-    <div class="nav-btn"><span>👥</span> Sosyal</div>
-    <div class="nav-btn"><span>👤</span> Profil</div>
+  <!-- Yüzen Hap Menü (Dynamic Island tarzı) -->
+  <div class="nav-island">
+    <div class="nav-btn active">🏡</div>
+    <div class="nav-btn">🎒</div>
+    <div class="nav-btn">💌</div>
+    <div class="nav-btn">⚙️</div>
   </div>
 
 </div>

@@ -76,6 +76,42 @@ app.post('/api/auth', async (req, res) => {
     res.json({ success: true });
 });
 
+// PET ODASI (OYUN SAHNESİ)
+app.get('/pet/:id', checkAuth, async (req, res) => {
+    try {
+        const worldId = req.params.id;
+        
+        const { data: worlds, error } = await supabase.rpc('my_worlds', { p_token: req.token });
+        if (error) throw error;
+        
+        // == kullanıyoruz çünkü parametre metin (string), veritabanı ID'si rakam (int) olabilir
+        const currentWorld = worlds ? worlds.find(w => w.id == worldId) : null;
+        
+        if (!currentWorld) {
+            return res.redirect('/'); // Dünya bulunamazsa ana menüye dön
+        }
+        
+        // Supabase bazen dizi, bazen obje döndürür. Çökmeyi engellemek için garantiliyoruz:
+        const petData = Array.isArray(currentWorld.pets) ? currentWorld.pets[0] : currentWorld.pets;
+        
+        // Eğer petData boş gelirse EJS çökmesin diye sahte bir yedek (fallback) atıyoruz
+        const safePet = petData || { 
+            name: 'Gizemli Pet', type: 'cat', level: 1, hunger: 50, energy: 50, happiness: 50 
+        };
+        
+        res.render('pet', { 
+            player: req.user.username, 
+            world: currentWorld,
+            pet: safePet
+        });
+        
+    } catch (err) {
+        // Vercel'de hatanın sebebini görebilmek için ekrana basıyoruz
+        console.error("Oda yüklenirken hata:", err);
+        res.status(500).send("Oda yüklenemedi, sistem hatası: " + err.message);
+    }
+});
+
 // ÇIKIŞ YAPMA (Çerezi Sil)
 app.get('/logout', (req, res) => {
     res.clearCookie('mellow_token');

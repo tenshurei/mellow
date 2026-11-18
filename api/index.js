@@ -33,24 +33,30 @@ const checkAuth = async (req, res, next) => {
     next();
 };
 
-// ANA SAYFA (SADECE GİRİŞ YAPANLAR GÖREBİLİR)
 app.get('/', checkAuth, async (req, res) => {
-    // Senin yazdığın 'my_worlds' fonksiyonu ile oyuncunun dünyalarını çekiyoruz
-    const { data: worlds } = await supabase.rpc('my_worlds', { p_token: req.token });
-    
-    // EJS çökmesin diye arayüzün beklediği sahte veriyi şimdilik tekrar ekliyoruz
-    const petData = {
-        name: 'Mochi',
-        level: 4,
-        stats: { hunger: 80, energy: 60, happiness: 90 }
-    };
-    
-    // Verileri EJS'e yolla
-    res.render('index', { 
-        player: req.user.username, 
-        worlds: worlds || [],
-        pet: petData 
-    });
+    try {
+        const { data: worlds, error } = await supabase.rpc('my_worlds', { p_token: req.token });
+        if (error) throw error;
+        
+        // Supabase'den gelen pets verisini EJS'in çökmeyeceği GARANTİ bir formata çeviriyoruz
+        const safeWorlds = (worlds || []).map(w => {
+            const petData = Array.isArray(w.pets) ? w.pets[0] : w.pets;
+            return {
+                ...w,
+                safePet: petData || { name: 'Bilinmeyen Pet', type: 'cat', level: 1 }
+            };
+        });
+        
+        res.render('index', { 
+            player: req.user.username, 
+            worlds: safeWorlds
+        });
+        
+    } catch (err) {
+        // Eğer yine hata olursa artık beyaz ekran 500 yerine, hatanın ne olduğunu ekrana yazacak
+        console.error("Ana sayfa hatası:", err);
+        res.status(500).send("Ana sayfa yüklenirken bir hata oluştu: " + err.message);
+    }
 });
 
 // GİRİŞ/KAYIT EKRANI

@@ -189,6 +189,7 @@
   </div>
 
   <!-- Kaydırılabilir İçerik Alanı -->
+  <!-- Kaydırılabilir İçerik Alanı -->
   <div class="scroll-area">
     <div class="section-title">Evcil Hayvanların (<%= worlds.length %>)</div>
 
@@ -198,15 +199,15 @@
         <!-- İleride bu karta tıklandığında '/pet/ID' sayfasına (Odaya) gideceğiz -->
         <div class="pet-card" onclick="window.location.href='/pet/<%= world.id %>'">
           <div class="pet-icon">
-            <!-- 3D Render'lar gelene kadar geçici emoji -->
-            <%= (world.pets && world.pets[0] && world.pets[0].type === 'dog') ? '🐶' : (world.pets && world.pets[0] && world.pets[0].type === 'bunny') ? '🐰' : '🐱' %>
+            <!-- Artık çökme riski yok, safePet kullanıyoruz -->
+            <%= (world.safePet.type === 'dog') ? '🐶' : (world.safePet.type === 'bunny') ? '🐰' : '🐱' %>
           </div>
           <div class="pet-info">
-            <h3 class="pet-name"><%= world.pets ? world.pets[0].name : world.name %></h3>
+            <h3 class="pet-name"><%= world.safePet.name %></h3>
             <p class="pet-meta">🐾 <%= world.name %></p>
           </div>
           <div class="pet-level">
-            Lv. <%= world.pets ? world.pets[0].level : 1 %>
+            Lv. <%= world.safePet.level %>
           </div>
         </div>
       <% }); %>
@@ -219,7 +220,6 @@
         <a href="/create" class="btn-create">🐾 Yeni Pet Sahiplen</a>
       </div>
     <% } %>
-
   </div>
 
   <!-- Alt Navigasyon Barı -->
